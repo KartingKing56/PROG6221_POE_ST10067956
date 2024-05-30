@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -106,9 +107,21 @@ namespace PROG6221_POE_ST10067956
             List<string> ingredQuan = new List<string>();
             List<string> ingredUOM = new List<string>();
             List<string> description = new List<string>();
+            List<int> calories = new List<int>();
+            List<string> foodgroup = new List<string>();
+            int totalCalories = 0;
+
+            string[] localGroups = inputValidator.getFoodGroupList();
+
+            Console.WriteLine("When prompted, enter in the food group for your ingredient from this list:");
+            for (int i = 0; i < localGroups.Length; i++)
+            {
+                Console.WriteLine($"{localGroups[i]}");
+            }
 
             for (int i = 0; i < numberIngreds; i++)
             {
+                //Ingredient name
                 Console.WriteLine($"Enter the name of ingredient {i + 1}:");
                 string Ingredname = Console.ReadLine();
                 if (!inputValidator.IsValidIngredientName(Ingredname))
@@ -118,6 +131,7 @@ namespace PROG6221_POE_ST10067956
                 }
                 ingredName.Add(name);
 
+                //Ingredient quantity
                 Console.WriteLine($"Enter the quantity of ingredient {i + 1}:");
                 double quantity = double.Parse(Console.ReadLine());
                 if (!inputValidator.IsValidIngredientQuantity(quantity))
@@ -127,6 +141,7 @@ namespace PROG6221_POE_ST10067956
                 }
                 ingredQuan.Add(quantity.ToString());
 
+                //Ingredient measuremeant
                 Console.WriteLine($"Enter the unit of measurement for ingredient {i + 1}:");
                 string unit = GetValidUnit();
                 if (unit == null)
@@ -135,6 +150,24 @@ namespace PROG6221_POE_ST10067956
                 }
                 ingredUOM.Add(unit);
 
+                //Ingredient calories
+                Console.WriteLine($"Enter the total amount of calories for ingredient {i + 1}:");
+                int amount = int.Parse(Console.ReadLine());
+                if (!inputValidator.IsValidCaloryCount(amount))
+                {
+                    Console.WriteLine("Invalid number of calories. Please try again.");
+                    return;
+                }
+                calories.Add(amount);
+
+                //Ingredient food group
+                Console.WriteLine($"Enter the food group for ingredient {i + 1}:");
+                string group = Console.ReadLine();
+                if (!inputValidator.IsValidFoodGroupItem(group))
+                {
+                    return;
+                }
+                foodgroup.Add(group);
             }
 
             for (int i = 0; i < numberSteps; i++)
@@ -149,7 +182,25 @@ namespace PROG6221_POE_ST10067956
                 description.Add(desc);
             }
 
-            Recipe recipe = new Recipe(name, numberSteps, numberIngreds, ingredName, ingredQuan, ingredUOM, description);
+            for (int i = 0; i < calories.Count; i++)
+            {
+                totalCalories =+ calories[i];
+            }
+
+            Recipe recipe = new Recipe
+                (
+                name, 
+                numberSteps, 
+                numberIngreds, 
+                ingredName, 
+                ingredQuan, 
+                ingredUOM, 
+                description, 
+                foodgroup, 
+                calories, 
+                totalCalories
+                );
+
             recipeManager.AddRecipe(recipe);
 
             Console.WriteLine("Recipe added successfully!");
@@ -188,8 +239,32 @@ namespace PROG6221_POE_ST10067956
 
         private void EditRecipe()
         {
-            Console.WriteLine("Enter the name of the recipe you want to edit:");
+            int TotalCalories = 0;
+            
+            //Makes use of the code used in the view method to display the options preventing the user to guess the name of the recipe
+
+            List<Recipe> allRecipes = recipeManager.GetAllRecipes();
+            if (allRecipes.Count == 0)
+            {
+                Console.WriteLine("No recipes found.");
+                return;
+            }
+
+            Console.WriteLine("Here are all the available recipes:");
+            for (int i = 0; i < allRecipes.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {allRecipes[i].Name}");
+            }
+
+            Console.WriteLine("Enter the name of the recipe you want to edit, or type 'cancel' to go back to the main menu:");
             string name = Console.ReadLine();
+
+            if (name.ToLower() == "cancel")
+            {
+                return;
+            }
+
+            //Error handling when serching the for the recipe
 
             Recipe recipe = recipeManager.GetRecipe(name);
             if (recipe == null)
@@ -227,6 +302,7 @@ namespace PROG6221_POE_ST10067956
 
             for (int i = 0; i < newNumberIngreds; i++)
             {
+                //Ingredient name
                 Console.WriteLine($"Enter the new name of ingredient {i + 1}:");
                 string newIngredName = Console.ReadLine();
                 if (!inputValidator.IsValidIngredientName(newIngredName))
@@ -236,6 +312,7 @@ namespace PROG6221_POE_ST10067956
                 }
                 recipe.IngredName[i] = newIngredName;
 
+                //Ingredient quantity
                 Console.WriteLine($"Enter the new quantity of ingredient {i + 1}:");
                 double newQuantity = double.Parse(Console.ReadLine());
                 if (!inputValidator.IsValidIngredientQuantity(newQuantity))
@@ -245,6 +322,7 @@ namespace PROG6221_POE_ST10067956
                 }
                 recipe.IngredQuan[i] = newQuantity.ToString();
 
+                //Ingredient measuremeant
                 Console.WriteLine($"Enter the new unit of measurement for ingredient {i + 1}:");
                 string newUnit = GetValidUnit();
                 if (newUnit == null)
@@ -252,7 +330,31 @@ namespace PROG6221_POE_ST10067956
                     return;
                 }
                 recipe.IngredUOM[i] = newUnit;
+
+                //Ingredient calories
+                Console.WriteLine($"Enter the new amount of calories for ingredient {i + 1}:");
+                int amount = int.Parse(Console.ReadLine());
+                if (!inputValidator.IsValidCaloryCount(amount))
+                {
+                    Console.WriteLine("Invalid number of calories. Please try again.");
+                    return;
+                }
+                recipe.IngredCalory[i] = amount;
+
+                //Ingredient food group
+                Console.WriteLine($"Enter the food group for ingredient {i + 1}:");
+                string group = Console.ReadLine();
+                if (!inputValidator.IsValidFoodGroupItem(group))
+                {
+                    return;
+                }
+                recipe.IngredGroup[i] = group;
+
+                TotalCalories += amount;
             }
+
+            //Final value for the total calories
+            recipe.TotalCalory = TotalCalories;
 
             for (int i = 0; i < newNumberSteps; i++)
             {
@@ -310,7 +412,19 @@ namespace PROG6221_POE_ST10067956
             Recipe originalRecipe = allRecipes[index - 1];
 
             // Create a copy of the original recipe
-            Recipe recipe = new Recipe(originalRecipe.Name, originalRecipe.NumberSteps, originalRecipe.NumberIngreds, new List<string>(originalRecipe.IngredName), new List<string>(originalRecipe.IngredQuan), new List<string>(originalRecipe.IngredUOM), new List<string>(originalRecipe.Description));
+            Recipe recipe = new Recipe
+                (
+                originalRecipe.Name, 
+                originalRecipe.NumberSteps, 
+                originalRecipe.NumberIngreds, 
+                new List<string>(originalRecipe.IngredName), 
+                new List<string>(originalRecipe.IngredQuan), 
+                new List<string>(originalRecipe.IngredUOM), 
+                new List<string>(originalRecipe.Description), 
+                new List<string>(originalRecipe.IngredGroup), 
+                new List<int>(originalRecipe.IngredCalory), 
+                originalRecipe.TotalCalory
+                );
 
             Console.WriteLine("Do you want to scale the recipe? (yes/no)");
             string scaleOption = Console.ReadLine();
@@ -330,6 +444,8 @@ namespace PROG6221_POE_ST10067956
                     quantity *= factor;
                     recipe.IngredQuan[i] = quantity.ToString();
                 }
+
+                recipe.TotalCalory *= factor;
 
                 Console.WriteLine("Recipe scaled successfully!");
             }
@@ -369,13 +485,20 @@ namespace PROG6221_POE_ST10067956
             Console.WriteLine("Ingredients:");
             for (int i = 0; i < recipe.NumberIngreds; i++)
             {
-                Console.WriteLine($"Ingredient {i + 1}: {recipe.IngredName[i]}, {recipe.IngredQuan[i]} {recipe.IngredUOM[i]}");
+                Console.WriteLine($"Ingredient {i + 1}: {recipe.IngredName[i]}\t{recipe.IngredQuan[i]} {recipe.IngredUOM[i]}");
+                Console.WriteLine($"\tFood Group: {recipe.IngredGroup}");
+                Console.WriteLine($"\tCalories: {recipe.IngredCalory}");
             }
 
             Console.WriteLine("Steps:");
             for (int i = 0; i < recipe.NumberSteps; i++)
             {
                 Console.WriteLine($"Step {i + 1}: {recipe.Description[i]}");
+            }
+
+            if (recipe.TotalCalory > 300)
+            {
+                Console.WriteLine("The Calory count exceeds 300 Calories.");
             }
         }
 
