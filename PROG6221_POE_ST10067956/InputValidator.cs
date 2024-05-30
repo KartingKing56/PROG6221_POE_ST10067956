@@ -11,6 +11,8 @@ namespace PROG6221_POE_ST10067956
         private Dictionary<string, string> validUnits;
         private RecipeManager recipeManager;
 
+        string[] validFoodGroups = new string[6];
+
         /// <summary>
         /// public method to initialise all the necesary classes and variables
         /// </summary>
@@ -40,10 +42,22 @@ namespace PROG6221_POE_ST10067956
                 { "apple", "apple" }, { "apples", "apple" },
                 { "banana", "banana" }, { "bananas", "banana" },
                 { "carrot", "carrot" }, { "carrots", "carrot" },
-                { "potato", "potato" }, { "potatoes", "potato" }
+                { "potato", "potato" }, { "potatoes", "potato" },
+                { "pinch", "pinch"}, { "pinches", "pinch"}
             };
 
             recipeManager = manager;
+
+            validFoodGroups = new string[]
+            {
+                "Starchy foods",
+                "Vegatables and fruit",
+                "Dry beans, peas, lentils and soya",
+                "Chicken, fish, meat and eggs",
+                "Milk and dairy products",
+                "Fats and oil",
+                "Water"
+            };
         }
 
         //------------------------------------------------------------------------
@@ -122,6 +136,36 @@ namespace PROG6221_POE_ST10067956
         //------------------------------------------------------------------------
 
         /// <summary>
+        /// Check the value of the calories per ingredient isn't less than zero
+        /// </summary>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
+
+        //------------------------------------------------------------------------
+
+        public bool IsValidCaloryCount(int quantity)
+        {
+            return quantity > 0 && quantity < 500;
+        }
+
+        //------------------------------------------------------------------------
+
+        /// <summary>
+        /// Method to check if the total exceeds 300 Calories
+        /// </summary>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
+
+        //------------------------------------------------------------------------
+
+        public bool CheckTotalCalories(int quantity)
+        {
+            return quantity > 300;
+        }
+
+        //------------------------------------------------------------------------
+
+        /// <summary>
         /// Validation for the units of measurements
         /// </summary>
         /// <param name="unit"></param>
@@ -145,6 +189,47 @@ namespace PROG6221_POE_ST10067956
             }
 
             if (validUnits.ContainsValue(unit))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        //------------------------------------------------------------------------
+
+        /// <summary>
+        /// simple retrieval of the list in the interface class
+        /// </summary>
+        /// <returns></returns>
+
+        //------------------------------------------------------------------------
+
+        public string[] getFoodGroupList()
+        {
+            return validFoodGroups;
+        }
+
+        //------------------------------------------------------------------------
+
+        /// <summary>
+        /// check that the input is in the list of food groups
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+
+        //------------------------------------------------------------------------
+
+        public bool IsValidFoodGroupItem(string unit)
+        {
+            if (string.IsNullOrEmpty(unit))
+            {
+                return false;
+            }
+
+            unit = unit.ToLower();
+
+            if (validFoodGroups.Contains(unit))
             {
                 return true;
             }

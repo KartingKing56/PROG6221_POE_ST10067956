@@ -20,10 +20,26 @@ namespace PROG6221_POE_ST10067956
         /// <param name="ingredQuan"></param>
         /// <param name="ingredUOM"></param>
         /// <param name="description"></param>
+        /// <param name="ingredGroup"></param>
+        /// <param name="ingredCalory"></param>
+        /// <param name="totalCalory"></param>
 
         //------------------------------------------------------------------------
 
-        public Recipe(string name, int numberSteps, int numberIngreds, List<string> ingredName, List<string> ingredQuan, List<string> ingredUOM, List<string> description)
+        public Recipe
+            (
+            string name, 
+            int numberSteps, 
+            int numberIngreds, 
+            List<string> ingredName, 
+            List<string> ingredQuan, 
+            List<string> ingredUOM, 
+            List<string> description, 
+            List<string> ingredGroup, 
+            List<int> ingredCalory, 
+            double totalCalory
+            )
+
         {
             Name = name;
             NumberSteps = numberSteps;
@@ -32,6 +48,9 @@ namespace PROG6221_POE_ST10067956
             IngredQuan = ingredQuan;
             IngredUOM = ingredUOM;
             Description = description;
+            IngredGroup = ingredGroup;
+            IngredCalory = ingredCalory;
+            TotalCalory = totalCalory;
         }
 
         //------------------------------------------------------------------------
@@ -49,6 +68,9 @@ namespace PROG6221_POE_ST10067956
         public List<string> IngredQuan { get; set; }
         public List<string> IngredUOM { get; set; }
         public List<string> Description { get; set; }
+        public List<string> IngredGroup { get; set; }
+        public List<int> IngredCalory { get; set; }
+        public double TotalCalory { get; set; }
 
         //------------------------------------------------------------------------
     }

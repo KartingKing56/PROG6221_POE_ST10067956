@@ -73,6 +73,9 @@ namespace PROG6221_POE_ST10067956
                 recipe.IngredQuan = newRecipe.IngredQuan;
                 recipe.IngredUOM = newRecipe.IngredUOM;
                 recipe.Description = newRecipe.Description;
+                recipe.IngredGroup = newRecipe.IngredGroup;
+                recipe.IngredCalory = newRecipe.IngredCalory;
+                recipe.TotalCalory = newRecipe.TotalCalory;
 
                 return true;
             }
